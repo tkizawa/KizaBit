@@ -58,7 +58,9 @@ dotnet build
 - PRINT
 - LET
 - IF ... THEN
+- FOR ... NEXT
 - GOTO
+- GOSUB ... RETURN
 - END
 - REM
 
@@ -91,6 +93,17 @@ CPU
 60 IF A <= 5 THEN 40
 70 PRINT "DONE"
 RUN
+```
+
+サブルーチンとループの例:
+
+```text
+10 FOR I = 1 TO 3
+20 GOSUB 100
+30 NEXT I
+40 END
+100 PRINT "I=" + I
+110 RETURN
 ```
 
 ## CPU について
