@@ -17,3 +17,4 @@ D:\Dev\KizaBit\obj\Debug\net10.0-windows\KizaBit.pdb
 D:\Dev\KizaBit\obj\Debug\net10.0-windows\KizaBit.genruntimeconfig.cache
 D:\Dev\KizaBit\bin\Debug\net10.0-windows\KizaBit.pdb
 D:\Dev\KizaBit\obj\Debug\net10.0-windows\ref\KizaBit.dll
+D:\Dev\KizaBit\obj\Debug\net10.0-windows\KizaBit.sourcelink.json
