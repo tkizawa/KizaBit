@@ -7,7 +7,7 @@ public sealed class VirtualMachine
     public VirtualMachine()
     {
         Display = new DisplayBuffer(80, 25);
-        Cpu = new Z80Cpu();
+        Cpu = new M6809Cpu();
         basic = new BasicInterpreter(Display, Cpu);
 
         LoadCpuMonitor();
@@ -15,7 +15,7 @@ public sealed class VirtualMachine
 
     public DisplayBuffer Display { get; }
 
-    public Z80Cpu Cpu { get; }
+    public M6809Cpu Cpu { get; }
 
     public void Boot()
     {
@@ -23,7 +23,7 @@ public sealed class VirtualMachine
         Cpu.Reset();
         LoadCpuMonitor();
         Display.WriteLine("KizaBit 8-BIT COMPUTER");
-        Display.WriteLine("Z80 CPU 64K RAM");
+        Display.WriteLine("MOTOROLA 6809 CPU 64K RAM");
         Display.WriteLine("MICROSOFT BASIC STYLE INTERPRETER");
         Display.WriteLine();
         Display.WriteLine("READY.");
@@ -71,9 +71,9 @@ public sealed class VirtualMachine
     {
         Cpu.LoadProgram(0x0000, new byte[]
         {
-            0x3E, 0x00,
-            0x3C,
-            0xC3, 0x02, 0x00
+            0x86, 0x00,
+            0x4C,
+            0x7E, 0x00, 0x02
         });
     }
 }

@@ -10,9 +10,9 @@ public sealed class BasicInterpreter
     private readonly DisplayBuffer display;
     private readonly SortedDictionary<int, string> program = new();
     private readonly Dictionary<string, int> variables = new(StringComparer.OrdinalIgnoreCase);
-    private readonly Z80Cpu cpu;
+    private readonly M6809Cpu cpu;
 
-    public BasicInterpreter(DisplayBuffer display, Z80Cpu cpu)
+    public BasicInterpreter(DisplayBuffer display, M6809Cpu cpu)
     {
         this.display = display;
         this.cpu = cpu;

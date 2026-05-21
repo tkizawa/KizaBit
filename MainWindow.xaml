@@ -63,7 +63,7 @@
                                FontSize="28"
                                FontWeight="SemiBold"
                                Foreground="#F4E7C9" />
-                    <TextBlock Text="Z80 CPU / Microsoft BASIC style monitor / 80x25 CRT"
+                    <TextBlock Text="Motorola 6809 CPU / Microsoft BASIC style monitor / 80x25 CRT"
                                Margin="0,4,0,0"
                                FontSize="13"
                                Foreground="#C1AE86" />

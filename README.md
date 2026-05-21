@@ -1,6 +1,6 @@
 # KizaBit
 
-KizaBit は、WPF で動作するレトロ風の 8-bit コンピューターシミュレーターです。80x25 の CRT 風画面、簡易 Z80 CPU、Microsoft BASIC 風インタープリターを 1 つのウィンドウで操作できます。
+KizaBit は、WPF で動作するレトロ風の 8-bit コンピューターシミュレーターです。80x25 の CRT 風画面、簡易 Motorola 6809 CPU、Microsoft BASIC 風インタープリターを 1 つのウィンドウで操作できます。
 
 ## スクリーンショット
 
@@ -95,17 +95,17 @@ RUN
 
 ## CPU について
 
-内蔵 CPU は簡易的な Z80 風実装です。現在は以下のような基本命令の一部のみをサポートしています。
+内蔵 CPU は簡易的な Motorola 6809 風実装です。現在は以下のような基本命令の一部のみをサポートしています。
 
 - NOP
-- LD A,n / LD B,n / LD C,n
-- LD HL,nn / LD SP,nn
-- LD (nn),A / LD A,(nn)
-- INC A / DEC A
-- ADD A,B / ADD A,C
-- XOR A
-- JP nn
-- HALT
+- LDA #n / LDB #n
+- LDX #nn / LDY #nn / LDS #nn
+- STA addr / LDA addr
+- INCA / DECA / CLRA
+- ADDA #n
+- BRA / BEQ / BNE
+- JMP addr
+- SWI
 
 未対応命令を実行すると CPU は停止し、状態欄の LAST INSTR に内容が表示されます。
 
@@ -114,9 +114,9 @@ RUN
 - App.xaml, MainWindow.xaml: WPF アプリケーションと UI
 - VirtualMachine.cs: 仮想マシン全体の制御
 - BasicInterpreter.cs: BASIC 風インタープリター
-- Z80Cpu.cs: 簡易 CPU 実装
+- M6809Cpu.cs: 簡易 CPU 実装
 - DisplayBuffer.cs: 画面バッファ
 
 ## 補足
 
-このプロジェクトは教育用・試作用のシミュレーターです。完全な Z80 エミュレーターや完全互換 BASIC ではありません。
+このプロジェクトは教育用・試作用のシミュレーターです。完全な 6809 エミュレーターや完全互換 BASIC ではありません。
