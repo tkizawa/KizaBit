@@ -1,0 +1,205 @@
+﻿<Window x:Class="KizaBit.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="KizaBit"
+        Width="1280"
+        Height="860"
+        WindowStartupLocation="CenterScreen"
+        Background="#0A0907">
+    <Window.Resources>
+        <LinearGradientBrush x:Key="ShellBrush" StartPoint="0,0" EndPoint="1,1">
+            <GradientStop Color="#231E18" Offset="0" />
+            <GradientStop Color="#100E0B" Offset="1" />
+        </LinearGradientBrush>
+        <LinearGradientBrush x:Key="BezelBrush" StartPoint="0,0" EndPoint="0,1">
+            <GradientStop Color="#3E3528" Offset="0" />
+            <GradientStop Color="#1B1712" Offset="1" />
+        </LinearGradientBrush>
+        <LinearGradientBrush x:Key="ScreenBrush" StartPoint="0,0" EndPoint="0,1">
+            <GradientStop Color="#0A160F" Offset="0" />
+            <GradientStop Color="#030705" Offset="1" />
+        </LinearGradientBrush>
+        <DrawingBrush x:Key="ScanlinesBrush"
+                      TileMode="Tile"
+                      Viewport="0,0,6,6"
+                      ViewportUnits="Absolute"
+                      Viewbox="0,0,6,6"
+                      ViewboxUnits="Absolute"
+                      Stretch="None">
+            <DrawingBrush.Drawing>
+                <DrawingGroup>
+                    <GeometryDrawing Brush="#14000000" Geometry="M0,0 H6 V2 H0 Z" />
+                    <GeometryDrawing Brush="#1000FF9A" Geometry="M0,3 H6 V4 H0 Z" />
+                </DrawingGroup>
+            </DrawingBrush.Drawing>
+        </DrawingBrush>
+        <DropShadowEffect x:Key="OuterShadow"
+                          Color="#AA000000"
+                          BlurRadius="40"
+                          ShadowDepth="0"
+                          Opacity="0.85" />
+    </Window.Resources>
+
+    <Grid Background="{StaticResource ShellBrush}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <Border Margin="28,24,28,12"
+                Padding="18"
+                Background="#1A1712"
+                BorderBrush="#4D4030"
+                BorderThickness="1"
+                CornerRadius="18"
+                Effect="{StaticResource OuterShadow}">
+            <DockPanel LastChildFill="False">
+                <StackPanel Orientation="Vertical" DockPanel.Dock="Left">
+                    <TextBlock Text="KizaBit 8-bit Computer"
+                               FontSize="28"
+                               FontWeight="SemiBold"
+                               Foreground="#F4E7C9" />
+                    <TextBlock Text="Z80 CPU / Microsoft BASIC style monitor / 80x25 CRT"
+                               Margin="0,4,0,0"
+                               FontSize="13"
+                               Foreground="#C1AE86" />
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" DockPanel.Dock="Right">
+                    <Button x:Name="ResetButton"
+                            Width="110"
+                            Margin="0,0,10,0"
+                            Padding="12,7"
+                            Click="ResetButton_Click"
+                            Content="RESET" />
+                    <Button x:Name="DemoButton"
+                            Width="140"
+                            Margin="0,0,10,0"
+                            Padding="12,7"
+                            Click="DemoButton_Click"
+                            Content="LOAD DEMO" />
+                    <Button x:Name="StepButton"
+                            Width="110"
+                            Margin="0,0,10,0"
+                            Padding="12,7"
+                            Click="StepButton_Click"
+                            Content="CPU STEP" />
+                    <ToggleButton x:Name="RunToggleButton"
+                                  Width="110"
+                                  Padding="12,7"
+                                  Checked="RunToggleButton_Checked"
+                                  Unchecked="RunToggleButton_Unchecked"
+                                  Content="CPU RUN" />
+                </StackPanel>
+            </DockPanel>
+        </Border>
+
+        <Grid Grid.Row="1" Margin="28,0,28,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="3*" />
+                <ColumnDefinition Width="320" />
+            </Grid.ColumnDefinitions>
+
+            <Border Grid.Column="0"
+                    Padding="26"
+                    Margin="0,0,20,0"
+                    CornerRadius="30"
+                    Background="{StaticResource BezelBrush}"
+                    BorderBrush="#6D5C44"
+                    BorderThickness="2"
+                    Effect="{StaticResource OuterShadow}">
+                <Border Padding="24"
+                        CornerRadius="24"
+                        Background="#080C09"
+                        BorderBrush="#3E704B"
+                        BorderThickness="1">
+                    <Grid>
+                        <Border CornerRadius="18" Background="{StaticResource ScreenBrush}" />
+                        <Border CornerRadius="18" Background="#1400FF88" Opacity="0.15" />
+                        <Border CornerRadius="18" Background="{StaticResource ScanlinesBrush}" Opacity="0.45" />
+                        <Ellipse Margin="-120,-180,-20,120"
+                                 HorizontalAlignment="Right"
+                                 VerticalAlignment="Top"
+                                 Fill="#20A5FFDC"
+                                 IsHitTestVisible="False" />
+                        <Viewbox Margin="34" Stretch="Uniform">
+                            <TextBlock x:Name="ScreenTextBlock"
+                                       FontFamily="Consolas"
+                                       FontSize="16"
+                                       Foreground="#8DFFB6"
+                                       TextOptions.TextFormattingMode="Display"
+                                       TextOptions.TextRenderingMode="ClearType"
+                                       xml:space="preserve" />
+                        </Viewbox>
+                    </Grid>
+                </Border>
+            </Border>
+
+            <Border Grid.Column="1"
+                    Padding="18"
+                    CornerRadius="18"
+                    Background="#13110D"
+                    BorderBrush="#4D4030"
+                    BorderThickness="1"
+                    Effect="{StaticResource OuterShadow}">
+                <StackPanel>
+                    <TextBlock Text="SYSTEM STATUS"
+                               FontSize="18"
+                               FontWeight="SemiBold"
+                               Foreground="#F4E7C9" />
+                    <TextBlock x:Name="CpuStateTextBlock"
+                               Margin="0,18,0,0"
+                               FontFamily="Consolas"
+                               FontSize="15"
+                               Foreground="#D8FADF"
+                               TextWrapping="Wrap" />
+                    <Separator Margin="0,18,0,14" Background="#4D4030" />
+                    <TextBlock Text="KEYBOARD"
+                               FontSize="18"
+                               FontWeight="SemiBold"
+                               Foreground="#F4E7C9" />
+                    <TextBlock Margin="0,12,0,0"
+                               Text="BASIC 互換の即時実行と行番号プログラム入力に対応します。"
+                               Foreground="#C7D2B4"
+                               TextWrapping="Wrap" />
+                    <TextBlock Margin="0,10,0,0"
+                               Text="例: PRINT 2+2 / 10 PRINT &quot;HELLO&quot; / RUN / LIST / NEW"
+                               Foreground="#B1BE9A"
+                               TextWrapping="Wrap" />
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <Border Grid.Row="2"
+                Margin="28,14,28,24"
+                Padding="18"
+                CornerRadius="18"
+                Background="#15120D"
+                BorderBrush="#4D4030"
+                BorderThickness="1">
+            <DockPanel>
+                <TextBlock DockPanel.Dock="Left"
+                           Margin="0,0,14,0"
+                           VerticalAlignment="Center"
+                           FontFamily="Consolas"
+                           FontSize="18"
+                           Foreground="#8DFFB6"
+                           Text=">" />
+                <TextBox x:Name="CommandTextBox"
+                         VerticalContentAlignment="Center"
+                         FontFamily="Consolas"
+                         FontSize="18"
+                         Foreground="#E9FFE8"
+                         Background="#090D0A"
+                         BorderBrush="#31523C"
+                         BorderThickness="1"
+                         Padding="12,8"
+                         KeyDown="CommandTextBox_KeyDown" />
+            </DockPanel>
+        </Border>
+    </Grid>
+</Window>
