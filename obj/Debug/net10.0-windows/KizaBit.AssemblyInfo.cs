@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("KizaBit")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+b6dcded7320080056eb0d7af408d87e649e2537d")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+10e6dc6578cb414d0fb0f89ac8300e8f1a8c724d")]
 [assembly: System.Reflection.AssemblyProductAttribute("KizaBit")]
 [assembly: System.Reflection.AssemblyTitleAttribute("KizaBit")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
