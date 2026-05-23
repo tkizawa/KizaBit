@@ -126,15 +126,18 @@
                                  VerticalAlignment="Top"
                                  Fill="#20A5FFDC"
                                  IsHitTestVisible="False" />
-                        <Viewbox Margin="34" Stretch="Uniform">
+                        <Grid x:Name="ScreenViewport" Margin="34" SizeChanged="ScreenViewport_SizeChanged">
                             <TextBlock x:Name="ScreenTextBlock"
+                                       HorizontalAlignment="Left"
+                                       VerticalAlignment="Top"
                                        FontFamily="Consolas"
                                        FontSize="16"
                                        Foreground="#8DFFB6"
                                        TextOptions.TextFormattingMode="Display"
                                        TextOptions.TextRenderingMode="ClearType"
+                                       TextWrapping="NoWrap"
                                        xml:space="preserve" />
-                        </Viewbox>
+                        </Grid>
                     </Grid>
                 </Border>
             </Border>

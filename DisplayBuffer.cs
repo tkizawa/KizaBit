@@ -4,7 +4,7 @@ namespace KizaBit;
 
 public sealed class DisplayBuffer
 {
-    private readonly char[,] cells;
+    private char[,] cells;
     private int cursorColumn;
     private int cursorRow;
 
@@ -16,9 +16,22 @@ public sealed class DisplayBuffer
         Clear();
     }
 
-    public int Columns { get; }
+    public int Columns { get; private set; }
 
-    public int Rows { get; }
+    public int Rows { get; private set; }
+
+    public void Resize(int columns, int rows)
+    {
+        if (columns <= 0 || rows <= 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(columns), "Display dimensions must be positive.");
+        }
+
+        Columns = columns;
+        Rows = rows;
+        cells = new char[rows, columns];
+        Clear();
+    }
 
     public void Clear()
     {

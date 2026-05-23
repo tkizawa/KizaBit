@@ -1,5 +1,7 @@
-﻿using System.Windows.Input;
+﻿using System.Globalization;
+using System.Windows.Input;
 using System.Windows;
+using System.Windows.Media;
 using System.Windows.Threading;
 
 namespace KizaBit;
@@ -86,9 +88,46 @@ public partial class MainWindow : Window
         }
     }
 
+    private void ScreenViewport_SizeChanged(object sender, SizeChangedEventArgs e)
+    {
+        UpdateScreenFontSize();
+    }
+
     private void UpdateView()
     {
         ScreenTextBlock.Text = machine.Display.Render();
+        UpdateScreenFontSize();
         CpuStateTextBlock.Text = machine.Cpu.GetStateSummary();
+    }
+
+    private void UpdateScreenFontSize()
+    {
+        if (!IsLoaded || ScreenViewport.ActualWidth <= 0 || ScreenViewport.ActualHeight <= 0)
+        {
+            return;
+        }
+
+        var dpi = VisualTreeHelper.GetDpi(this).PixelsPerDip;
+        var sample = new FormattedText(
+            "W",
+            CultureInfo.InvariantCulture,
+            FlowDirection.LeftToRight,
+            new Typeface(
+                ScreenTextBlock.FontFamily,
+                ScreenTextBlock.FontStyle,
+                ScreenTextBlock.FontWeight,
+                ScreenTextBlock.FontStretch),
+            100,
+            Brushes.Transparent,
+            dpi);
+
+        var lineSpacing = ScreenTextBlock.FontFamily.LineSpacing;
+        var widthPerEm = sample.WidthIncludingTrailingWhitespace / 100d;
+        var maxWidthFont = ScreenViewport.ActualWidth / (machine.Display.Columns * widthPerEm);
+        var maxHeightFont = ScreenViewport.ActualHeight / (machine.Display.Rows * lineSpacing);
+        var fontSize = Math.Max(6d, Math.Floor(Math.Min(maxWidthFont, maxHeightFont)));
+
+        ScreenTextBlock.FontSize = fontSize;
+        ScreenTextBlock.LineHeight = fontSize * lineSpacing;
     }
 }

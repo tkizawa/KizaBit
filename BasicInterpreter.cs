@@ -104,7 +104,7 @@ public sealed class BasicInterpreter
 
     private void ShowHelp()
     {
-        display.WriteLine("COMMANDS: NEW LIST RUN CLS HELP CPU");
+        display.WriteLine("COMMANDS: NEW LIST RUN CLS WIDTH HELP CPU");
         display.WriteLine("STATEMENTS: PRINT LET IF THEN GOTO FOR NEXT GOSUB RETURN END REM");
     }
 
@@ -174,6 +174,12 @@ public sealed class BasicInterpreter
         if (upper == "CLS")
         {
             display.Clear();
+            return;
+        }
+
+        if (upper.StartsWith("WIDTH", StringComparison.Ordinal))
+        {
+            ExecuteWidth(trimmed[5..]);
             return;
         }
 
@@ -256,6 +262,32 @@ public sealed class BasicInterpreter
             RequireProgramContext(context);
             context!.JumpToLine(ParseLineNumber(target));
         }
+    }
+
+    private void ExecuteWidth(string expression)
+    {
+        var args = expression.Trim();
+        if (args.Length == 0)
+        {
+            throw new BasicRuntimeException("SYNTAX ERROR");
+        }
+
+        var parts = args
+            .Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+
+        if (parts.Length is < 1 or > 2)
+        {
+            throw new BasicRuntimeException("SYNTAX ERROR");
+        }
+
+        var columns = EvaluateNumericExpression(parts[0]);
+        var rows = parts.Length == 2 ? EvaluateNumericExpression(parts[1]) : display.Rows;
+        if (columns <= 0 || rows <= 0)
+        {
+            throw new BasicRuntimeException("BAD SCREEN SIZE");
+        }
+
+        display.Resize(columns, rows);
     }
 
     private void ExecuteFor(string expression, ExecutionContext context)
