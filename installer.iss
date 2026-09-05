@@ -1,3 +1,7 @@
+#ifndef AppArch
+  #define AppArch "x64"
+#endif
+
 #define MyAppName "KizaBit"
 #define MyAppVersion "1.0.0.0"
 #define MyAppPublisher "KizaBit"
@@ -11,14 +15,19 @@ AppPublisher={#MyAppPublisher}
 DefaultDirName={autopf}\{#MyAppName}
 DefaultGroupName={#MyAppName}
 OutputDir=Installer
-OutputBaseFilename=KizaBit_Setup_{#MyAppVersion}_x64
+OutputBaseFilename=KizaBit_Setup_{#MyAppVersion}_{#AppArch}
 SetupIconFile=Assets\app.ico
 UninstallDisplayIcon={app}\{#MyAppExeName}
 Compression=lzma2/ultra64
 SolidCompression=yes
 WizardStyle=modern
+#if AppArch == "arm64"
+ArchitecturesInstallIn64BitMode=arm64
+ArchitecturesAllowed=arm64
+#else
 ArchitecturesInstallIn64BitMode=x64compatible
 ArchitecturesAllowed=x64compatible
+#endif
 DisableProgramGroupPage=yes
 
 [Languages]
@@ -29,7 +38,7 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-Source: "publish\win-x64\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "publish\win-{#AppArch}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Icons]
 Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
