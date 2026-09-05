@@ -42,6 +42,23 @@ public partial class MainWindow : Window
         // イベントハンドラーの登録
         Loaded += MainWindow_Loaded;
         Closing += MainWindow_Closing;
+        PreviewKeyDown += MainWindow_PreviewKeyDown;
+    }
+
+    /// <summary>
+    /// ウィンドウ全体でのキー押下イベント
+    /// BASICプログラム実行中の Esc キーまたは Ctrl+C による中断（BREAK）を処理します。
+    /// </summary>
+    private void MainWindow_PreviewKeyDown(object sender, KeyEventArgs e)
+    {
+        if (machine.IsBasicRunning)
+        {
+            if (e.Key == Key.Escape || (e.Key == Key.C && (Keyboard.Modifiers & ModifierKeys.Control) != 0))
+            {
+                machine.Break();
+                e.Handled = true;
+            }
+        }
     }
 
     /// <summary>
@@ -65,6 +82,7 @@ public partial class MainWindow : Window
     /// </summary>
     private void MainWindow_Closing(object? sender, CancelEventArgs e)
     {
+        machine.Break();
         cpuTimer.Stop();
         SettingsService.RecordWindowPlacement(this, appSettings);
         SettingsService.SaveSettings(appSettings);
@@ -72,8 +90,9 @@ public partial class MainWindow : Window
 
     /// <summary>
     /// コマンド入力テキストボックスでEnterキーが押された時の処理
+    /// 非同期で実行し、リアルタイムな画面描画を反映します。
     /// </summary>
-    private void CommandTextBox_KeyDown(object sender, KeyEventArgs e)
+    private async void CommandTextBox_KeyDown(object sender, KeyEventArgs e)
     {
         if (e.Key != Key.Enter)
         {
@@ -82,9 +101,19 @@ public partial class MainWindow : Window
 
         var command = CommandTextBox.Text;
         CommandTextBox.Clear();
-        machine.SubmitCommand(command);
-        UpdateView();
         e.Handled = true;
+
+        CommandTextBox.IsEnabled = false;
+        try
+        {
+            await machine.SubmitCommandAsync(command, UpdateView);
+        }
+        finally
+        {
+            CommandTextBox.IsEnabled = true;
+            UpdateView();
+            CommandTextBox.Focus();
+        }
     }
 
     /// <summary>
@@ -92,6 +121,7 @@ public partial class MainWindow : Window
     /// </summary>
     private void ResetButton_Click(object sender, RoutedEventArgs e)
     {
+        machine.Break();
         cpuTimer.Stop();
         RunToggleButton.IsChecked = false;
         machine.Reset();

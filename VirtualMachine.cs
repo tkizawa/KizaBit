@@ -29,13 +29,40 @@ public sealed class VirtualMachine
         Display.WriteLine("READY.");
     }
 
+    private CancellationTokenSource? currentCommandCts;
+
+    /// <summary>
+    /// BASICプログラムが現在実行中かどうかを取得します。
+    /// </summary>
+    public bool IsBasicRunning => currentCommandCts != null;
+
+    /// <summary>
+    /// 現在実行中のBASICプログラムを安全に中断（BREAK）します。
+    /// </summary>
+    public void Break()
+    {
+        currentCommandCts?.Cancel();
+    }
+
     public void Reset()
     {
+        Break();
         basic.ClearProgram();
         Boot();
     }
 
+    /// <summary>
+    /// コマンドを同期的に実行します。
+    /// </summary>
     public void SubmitCommand(string command)
+    {
+        SubmitCommandAsync(command).GetAwaiter().GetResult();
+    }
+
+    /// <summary>
+    /// コマンドを非同期に実行します。実行中の画面更新コールバックに対応します。
+    /// </summary>
+    public async Task SubmitCommandAsync(string command, Action? onYield = null)
     {
         if (string.IsNullOrWhiteSpace(command))
         {
@@ -44,8 +71,19 @@ public sealed class VirtualMachine
             return;
         }
 
-        Display.WriteLine($"> {command.Trim()}" );
-        basic.ProcessInput(command);
+        Display.WriteLine($"> {command.Trim()}");
+
+        using var cts = new CancellationTokenSource();
+        currentCommandCts = cts;
+
+        try
+        {
+            await basic.ProcessInputAsync(command, cts.Token, onYield);
+        }
+        finally
+        {
+            currentCommandCts = null;
+        }
     }
 
     public void LoadDemoProgram()

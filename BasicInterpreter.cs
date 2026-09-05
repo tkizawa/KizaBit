@@ -25,7 +25,18 @@ public sealed class BasicInterpreter
         variables.Clear();
     }
 
+    /// <summary>
+    /// 入力文字列（プログラム行または即時コマンド）を同期的に処理します。
+    /// </summary>
     public void ProcessInput(string input)
+    {
+        ProcessInputAsync(input).GetAwaiter().GetResult();
+    }
+
+    /// <summary>
+    /// 入力文字列（プログラム行または即時コマンド）を非同期に処理します。
+    /// </summary>
+    public async Task ProcessInputAsync(string input, CancellationToken cancellationToken = default, Action? onYield = null)
     {
         try
         {
@@ -36,7 +47,12 @@ public sealed class BasicInterpreter
                 return;
             }
 
-            ExecuteImmediate(trimmed);
+            await ExecuteImmediateAsync(trimmed, cancellationToken, onYield);
+            display.WriteLine("READY.");
+        }
+        catch (OperationCanceledException)
+        {
+            // 中断時は READY. を表示してプロンプトへ復帰
             display.WriteLine("READY.");
         }
         catch (BasicRuntimeException exception)
@@ -71,6 +87,11 @@ public sealed class BasicInterpreter
 
     private void ExecuteImmediate(string input)
     {
+        ExecuteImmediateAsync(input, CancellationToken.None, null).GetAwaiter().GetResult();
+    }
+
+    private async Task ExecuteImmediateAsync(string input, CancellationToken cancellationToken, Action? onYield)
+    {
         var upper = input.ToUpperInvariant();
 
         switch (upper)
@@ -85,7 +106,7 @@ public sealed class BasicInterpreter
                 ListProgram();
                 return;
             case "RUN":
-                RunProgram();
+                await RunProgramAsync(cancellationToken, onYield);
                 return;
             case "CLS":
                 display.Clear();
@@ -118,17 +139,40 @@ public sealed class BasicInterpreter
 
     private void RunProgram()
     {
+        RunProgramAsync(CancellationToken.None, null).GetAwaiter().GetResult();
+    }
+
+    /// <summary>
+    /// BASICプログラムを非同期に実行します。
+    /// 実行中にUIスレッドをブロックせず、適度なディレイを挟むことで高負荷を防ぎ、リアルタイム描画と中断に対応します。
+    /// </summary>
+    public async Task RunProgramAsync(CancellationToken cancellationToken = default, Action? onYield = null)
+    {
         variables.Clear();
 
         var lines = program.ToArray();
+        if (lines.Length == 0)
+        {
+            return;
+        }
+
         var lineIndexMap = lines
             .Select((line, index) => new { line.Key, index })
             .ToDictionary(item => item.Key, item => item.index);
 
         var context = new ExecutionContext(lines, lineIndexMap);
 
+        var stepCounter = 0;
+        var lastYieldTime = Environment.TickCount64;
+
         while (context.Pointer < lines.Length && !context.IsTerminated)
         {
+            if (cancellationToken.IsCancellationRequested)
+            {
+                display.WriteLine($"BREAK IN {context.GetCurrentLineNumber()}");
+                cancellationToken.ThrowIfCancellationRequested();
+            }
+
             ExecuteStatement(lines[context.Pointer].Value, context);
 
             if (context.IsTerminated)
@@ -144,6 +188,20 @@ public sealed class BasicInterpreter
             }
 
             context.Pointer++;
+            stepCounter++;
+
+            // 一定ステップ毎、または一定時間（約15ms）毎に画面更新とディレイを実施
+            // これによりUIメッセージループが回り、CRT画面がリアルタイムにスクロールし、CPU負荷も抑えられます。
+            var now = Environment.TickCount64;
+            if (stepCounter >= 10 || now - lastYieldTime >= 15)
+            {
+                stepCounter = 0;
+                lastYieldTime = now;
+                onYield?.Invoke();
+
+                // 2msの非同期ディレイでUIスレッドに制御を戻す
+                await Task.Delay(2, cancellationToken);
+            }
         }
     }
 
@@ -596,6 +654,16 @@ public sealed class BasicInterpreter
         public int? NextIndex { get; set; }
 
         public bool IsTerminated { get; private set; }
+
+        /// <summary>
+        /// 現在実行中の行番号を取得します。
+        /// </summary>
+        public int GetCurrentLineNumber()
+        {
+            if (lines.Length == 0) return 0;
+            var safeIndex = Math.Clamp(Pointer, 0, lines.Length - 1);
+            return lines[safeIndex].Key;
+        }
 
         public void Terminate()
         {
