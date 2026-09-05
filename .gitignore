@@ -5,4 +5,5 @@ obj/
 *.suo
 *.cache
 Installer/
-MSIX/
+MSIX/
+publish/
